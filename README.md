@@ -28,12 +28,12 @@ transform = transforms.Compose([transforms.ToTensor(),
                               ])
 
 # Download and load the training data
-trainset = datasets.MNIST('~/.pytorch/MNIST_data/', download=True, train=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
+train = datasets.MNIST('~/.pytorch/MNIST_data/', download=True, train=True, transform=transform)
+train_loader = torch.utils.data.DataLoader(train, batch_size=64, shuffle=True)
 
 # Download and load the test data
-testset = datasets.MNIST('~/.pytorch/MNIST_data/', download=True, train=False, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=True)
+test = datasets.MNIST('~/.pytorch/MNIST_data/', download=True, train=False, transform=transform)
+test_loader = torch.utils.data.DataLoader(test, batch_size=200, shuffle=True)
 ```
 
 In this code, we first define a transform to normalize the data using `transforms.Normalize()`. We then download and load the training data using `datasets.MNIST()` with `train=True` and the transform we defined. We create a `DataLoader` for the training data using `torch.utils.data.DataLoader()` with a batch size of 64 and shuffle set to True.
@@ -42,50 +42,89 @@ We then download and load the test data using `datasets.MNIST()` with `train=Fal
 
 ## Using the Data
 
-Once you have downloaded and loaded the MNIST dataset, you can use it to train and test machine learning models. Here's an example of how to train a simple feedforward neural network on the MNIST dataset using PyTorch:
+Once you have downloaded and loaded the MNIST dataset, you can use it to train and test machine-learning models. Here's an example of how to train a simple feedforward neural network on the MNIST dataset using PyTorch:
 
 ```python
-import torch.nn as nn
-import torch.optim as optim
 
-# Define the neural network
 class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(784, 128)
-        self.fc2 = nn.Linear(128, 64)
-        self.fc3 = nn.Linear(64, 10)
+    def __init__(self, dropout_prob=0.5):
+        super().__init__()
+        self.activation = F.relu
+        self.dropout_prob = dropout_prob
+
+        self.fc1 = nn.Linear(28*28, 512)
+        self.dropout1 = nn.Dropout(p=dropout_prob)
+
+        self.fc2 = nn.Linear(512, 128)
+        self.dropout2 = nn.Dropout(p=dropout_prob)
+
+        self.fc3 = nn.Linear(128, 10)
 
     def forward(self, x):
-        x = x.view(-1, 784)
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+        x = torch.flatten(x, 1)
+        x = self.activation(self.fc1(x))
+        x = self.dropout1(x)
 
-# Create an instance of the neural network and move it to the GPU if available
-net = Net()
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        x = self.activation(self.fc2(x))
+        x = self.dropout2(x)
+
+        x = F.softmax(self.fc3(x))
+        return x
+net=Net()    
 net.to(device)
 
-# Define the loss function and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
+def train_model(net, train_loader, test_loader, num_epoch=300, lr=0.001, momentum=0.5):
+    optimizer = optim.SGD(net.parameters(), lr=lr,momentum=momentum)
+    criterion = nn.CrossEntropyLoss()
 
-# Train the neural network
-for epoch in range(10):
-    running_loss = 0.0
-    for i, data in enumerate(trainloader, 0):
-        inputs, labels = data[0].to(device), data[1].to(device)
-        optimizer.zero_grad()
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        running_loss += loss.item()
-        if i % 100 == 99:
-            print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 100))
-            running_loss = 0.0
+    train_loss_history = []
+    test_loss_history = []
+
+    for epoch in range(num_epoch):
+        net.train()
+        train_loss = 0
+        train_correct = 0
+        for i, data in enumerate(train_loader):
+            inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device)
+
+            optimizer.zero_grad()
+            output = net(inputs)
+            loss = criterion(output, labels)
+            loss.backward()
+            optimizer.step()
+
+            _, preds = torch.max(output.data, 1)
+            train_correct += (preds == labels).sum().item()
+            train_loss += loss.item()
+
+        train_loss_history.append(train_loss / len(train_loader))
+        train_acc = train_correct / len(train_loader.dataset)
+
+        net.eval()
+        test_loss = 0.0
+        test_correct = 0
+        with torch.no_grad():
+            for inputs, labels in test_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+
+                outputs = net(inputs)
+                loss = criterion(outputs, labels)
+
+                _, preds = torch.max(outputs.data, 1)
+                test_correct += (preds == labels).sum().item()
+                test_loss += loss.item()
+
+        test_loss_history.append(test_loss / len(test_loader))
+        test_acc = test_correct / len(test_loader.dataset)
+
+        print(f'Epoch {epoch + 1} training accuracy: {train_acc:.2f}% training loss: {train_loss / len(train_loader):.5f}')
+        print(f'Epoch {epoch + 1} test accuracy: {test_acc:.2f}% test loss: {test_loss / len(test_loader):.5f}')
+
+    plt.plot(train_loss_history, label="Training Loss")
+    plt.plot(test_loss_history, label="test Loss")
+    plt.legend()
+    plt.show()
 ```
 
 In this code, we first define a simple feedforward neural network called `Net` with three fully connected layers. We define the `forward()` method to specify how the data flows through the network.
