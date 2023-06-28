@@ -131,7 +131,7 @@ In this code, we first define a simple feedforward neural network called `Net` w
 
 We then create an instance of the `Net` class and move it to the GPU if available using `net.to(device)`.
 
-We define the loss function as cross-entropy loss and the optimizer as stochastic gradient descent (SGD) with momentum. We then use a `for` loop to train the neural network for 400 epochs. In each epoch, we iterate over the training data using a `for` loop and use the `optimizer` to update the weights of the neural network based on the loss calculated by the `criterion`. We print the training loss every 64 batches.
+We define the loss function as cross-entropy loss and the optimizer as stochastic gradient descent (SGD) with momentum. We then use a `for` loop to train the neural network for 400 epochs. In each epoch, we iterate over the training data using a `for` loop and use the `optimizer` to update the weights of the neural network based on the loss calculated by the `criterion`. We print the training loss every batch.
 
 ## Conclusion
 
