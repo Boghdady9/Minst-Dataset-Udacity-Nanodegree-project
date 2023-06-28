@@ -1,0 +1,14 @@
+
+```
+torch>=1.9.0
+matplotlib>=3.4.3
+numpy>=1.21.2
+```
+
+You can use this file to install the required packages using pip:
+
+```
+pip install -r requirements.txt
+```
+
+This will install the specified versions of PyTorch, matplotlib, and NumPy, along with any dependencies required by these packages.
