@@ -75,7 +75,7 @@ net.to(device)
 
 def train_model(net, train_loader, test_loader, num_epoch=300, lr=0.001, momentum=0.5):
     optimizer = optim.SGD(net.parameters(), lr=lr,momentum=momentum)
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.NLLLoss()
 
     train_loss_history = []
     test_loss_history = []
