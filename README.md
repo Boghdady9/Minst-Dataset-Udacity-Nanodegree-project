@@ -133,10 +133,6 @@ We then create an instance of the `Net` class and move it to the GPU if availabl
 
 We define the loss function as cross-entropy loss and the optimizer as stochastic gradient descent (SGD) with momentum. We then use a `for` loop to train the neural network for 400 epochs. In each epoch, we iterate over the training data using a `for` loop and use the `optimizer` to update the weights of the neural network based on the loss calculated by the `criterion`. We print the training loss every batch.
 
-## Conclusion
 
-In this tutorial, we showed you how to downloadand load the MNIST dataset using PyTorch, and how to use the dataset to train a simple feedforward neural network. You can use this code as a starting point to train more complex models on the MNIST dataset, or to explore other computer vision tasks using PyTorch.
 
-When working with the MNIST dataset, it's important to keep in mind that it is a relatively simple dataset, and that more complex datasets may require more sophisticated models and techniques. Nonetheless, MNIST is a great dataset for getting started with machine learning and computer vision, and is widely used in the research community for benchmarking new models and techniques.
 
-If you're new to PyTorch or machine learning in general, we recommend exploring the PyTorch documentation and tutorials to learn more about the framework and how to use it for machine learning tasks. There are also many resources online, including blogs, videos, and forums, that can help you learn more about machine learning and computer vision.
