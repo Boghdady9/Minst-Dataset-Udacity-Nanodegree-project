@@ -1,11 +1,11 @@
 # Minst-Dataset-Udacity-Nanodegree-project
 # MNIST Dataset with PyTorch
 
-This is a tutorial on how to use the MNIST dataset with PyTorch. The MNIST dataset is a collection of 70,000 handwritten digits, split into 60,000 training examples and 10,000 test examples. Each example is a grayscale image of size 28x28, and the goal is to classify each image into one of 10 possible classes (0-9).
+In this project, I build a neural network that predicts the label of the image. The MNIST dataset is a collection of 70,000 handwritten digits, split into 60,000 training examples and 10,000 test examples. Each example is a grayscale image of size 28x28, and the goal is to classify each image into one of 10 possible classes (0-9).
 
 ## Requirements
 
-- Python 3.x
+- Python 3
 - PyTorch
 
 You can install PyTorch using pip:
